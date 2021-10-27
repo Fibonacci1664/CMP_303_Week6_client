@@ -31,7 +31,7 @@ void die(const char *message);
 // Define struct HERE!
 struct PlayerData
 {
-	std::string playerID = "";
+	char playerID[4] = { '*', '*', '*', '*', };
 	int playerXpos = 0;
 	int playerYpos = 0;
 };
@@ -75,29 +75,32 @@ int main()
 	// We'll use this buffer to hold the messages we exchange with the server.
 	char buffer[MESSAGESIZE];
 
+	printf("Type some text (\"quit\" to exit): ");
+	fflush(stdout);
+	std::string line;
+	std::getline(std::cin, line);
+
+	PlayerData player_1_data;
+
+	for (int i = 0; i < sizeof(player_1_data.playerID); ++i)
+	{
+		player_1_data.playerID[i] = line[i];
+	}
+
+	player_1_data.playerXpos = 5;
+	player_1_data.playerYpos = 10;
+
 	do
 	{
-		printf("Type some text (\"quit\" to exit): ");
-		fflush(stdout);
+		
 
 		// Read a line of text from the user.
-		std::string line;
-		std::getline(std::cin, line);
+		
 		// Now "line" contains what the user typed (without the trailing \n).
 
 		// Copy the line into the buffer, filling the rest with dashes.
 		/*memset(buffer, '-', MESSAGESIZE);
 		memcpy(buffer, line.c_str(), min(line.size(), MESSAGESIZE));*/
-
-		PlayerData player_1_data;
-
-		for (int i = 0; i < line.size(); ++i)
-		{
-			player_1_data.playerID.push_back(line[i]);
-		}
-		
-		player_1_data.playerXpos = 5;
-		player_1_data.playerYpos = 10;
 
 		// Send the message to the server.
 		if (sendto(sock, (const char*) &player_1_data, sizeof(PlayerData), 0, (const sockaddr *)&toAddr, sizeof(toAddr)) != sizeof(PlayerData))
@@ -106,7 +109,7 @@ int main()
 		}
 
 		// Read a response back from the server (or from anyone, in fact).
-		sockaddr_in fromAddr;
+		/*sockaddr_in fromAddr;
 		int fromAddrSize = sizeof(fromAddr);
 		int count = recvfrom(sock, buffer, MESSAGESIZE, 0, (sockaddr *) &fromAddr, &fromAddrSize);
 		if (count < 0)
@@ -121,7 +124,7 @@ int main()
 		printf("Received %d bytes from address %s port %d: '",
 			   count, inet_ntoa(fromAddr.sin_addr), ntohs(fromAddr.sin_port));
 		fwrite(buffer, 1, count, stdout);
-		printf("'\n");
+		printf("'\n");*/
 
 		Sleep(1000);
 
